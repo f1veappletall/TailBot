@@ -286,14 +286,23 @@ export const ChatbotInterface = (): JSX.Element => {
 console.log("🐾 Netlify Function Result:", result);
 
 if (!response.ok) {
-  throw new Error(result?.error || result?.message || "Image prediction failed");
+  throw new Error(
+    result?.raw || result?.error || `Prediction failed (${result?.upstreamStatus || response.status})`
+  );
 }
 
-if (!Array.isArray(result) || result.length === 0) {
+let parsed;
+try {
+  parsed = JSON.parse(result.raw);
+} catch {
+  throw new Error(`Upstream did not return JSON: ${result.raw}`);
+}
+
+if (!Array.isArray(parsed) || parsed.length === 0) {
   throw new Error("No valid prediction");
 }
-  
-      const label = result?.[0]?.label?.split(",")[0] || "something";
+
+const label = parsed?.[0]?.label?.split(",")[0] || "something";
   
       const botMessage: ChatMessage = {
         id: messages.length + 2,
