@@ -283,11 +283,15 @@ export const ChatbotInterface = (): JSX.Element => {
 });
   
       const result = await response.json();
-      console.log("🐾 Huggingface Result:", result);
-  
-      if (!Array.isArray(result) || result.length === 0) {
-        throw new Error("No valid prediction");
-      }
+console.log("🐾 Netlify Function Result:", result);
+
+if (!response.ok) {
+  throw new Error(result?.error || result?.message || "Image prediction failed");
+}
+
+if (!Array.isArray(result) || result.length === 0) {
+  throw new Error("No valid prediction");
+}
   
       const label = result?.[0]?.label?.split(",")[0] || "something";
   
