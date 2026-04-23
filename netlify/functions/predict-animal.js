@@ -15,7 +15,7 @@ exports.handler = async (event) => {
         statusCode: 500,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          error: "Missing HUGGING_FACE_API_TOKEN in Netlify environment variables",
+          error: "Missing HUGGING_FACE_API_TOKEN",
         }),
       };
     }
@@ -36,21 +36,31 @@ exports.handler = async (event) => {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": contentType,
+          Accept: "application/json",
         },
         body: imageBuffer,
       }
     );
 
-    const text = await hfResponse.text();
+    const rawText = await hfResponse.text();
+
+    console.log("HF status:", hfResponse.status);
+    console.log("HF content-type:", hfResponse.headers.get("content-type"));
+    console.log("HF raw response:", rawText);
 
     return {
-      statusCode: hfResponse.status,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: text,
+      statusCode: hfResponse.ok ? 200 : 502,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ok: hfResponse.ok,
+        upstreamStatus: hfResponse.status,
+        upstreamContentType: hfResponse.headers.get("content-type"),
+        raw: rawText,
+      }),
     };
   } catch (error) {
+    console.log("Function error:", error);
+
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
