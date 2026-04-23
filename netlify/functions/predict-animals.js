@@ -8,7 +8,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const token = process.env.HUGGINGFACE_API_KEY;
+    const token = process.env.HUGGINGFACE_API_KEY_TOKEN;
 
     if (!token) {
       return {
