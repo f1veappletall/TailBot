@@ -8,34 +8,43 @@ exports.handler = async (event) => {
       };
     }
 
-    const token = process.env.HUGGINGFACE_API_KEY_TOKEN;
+    const token = process.env.HUGGING_FACE_API_TOKEN;
 
     if (!token) {
       return {
         statusCode: 500,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          error: "Missing HUGGINGFACE_API_KEY in Netlify environment variables",
+          error: "Missing HUGGING_FACE_API_TOKEN in Netlify environment variables",
         }),
       };
     }
 
-    const response = await fetch(
+    const contentType =
+      event.headers["content-type"] ||
+      event.headers["Content-Type"] ||
+      "application/octet-stream";
+
+    const imageBuffer = event.isBase64Encoded
+      ? Buffer.from(event.body || "", "base64")
+      : Buffer.from(event.body || "", "binary");
+
+    const hfResponse = await fetch(
       "https://api-inference.huggingface.co/models/google/vit-base-patch16-224",
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": event.headers["content-type"] || "application/octet-stream",
+          "Content-Type": contentType,
         },
-        body: event.body,
+        body: imageBuffer,
       }
     );
 
-    const text = await response.text();
+    const text = await hfResponse.text();
 
     return {
-      statusCode: response.status,
+      statusCode: hfResponse.status,
       headers: {
         "Content-Type": "application/json",
       },
