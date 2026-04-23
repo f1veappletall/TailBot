@@ -6,7 +6,11 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-# React SPA fallback — avoids 404 on refresh or deep links
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
