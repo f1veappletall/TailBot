@@ -274,15 +274,13 @@ export const ChatbotInterface = (): JSX.Element => {
     setShowCameraDialog(false);
   
     try {
-      const apiKey = import.meta.env.VITE_HUGGINGFACE_API_KEY;
-  
-      const response = await fetch("https://api-inference.huggingface.co/models/google/vit-base-patch16-224", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`
-        },
-        body: selectedImage // ✅ send the raw image file directly
-      });
+    const response = await fetch("/.netlify/functions/predict-animal", {
+  method: "POST",
+  headers: {
+    "Content-Type": selectedImage.type || "application/octet-stream"
+  },
+  body: selectedImage
+});
   
       const result = await response.json();
       console.log("🐾 Huggingface Result:", result);
