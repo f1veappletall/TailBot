@@ -30,7 +30,7 @@ exports.handler = async (event) => {
       : Buffer.from(event.body || "", "binary");
 
     const hfResponse = await fetch(
-      "https://api-inference.huggingface.co/models/google/vit-base-patch16-224",
+     "https://router.huggingface.co/hf-inference/models/google/vit-base-patch16-224",
       {
         method: "POST",
         headers: {
